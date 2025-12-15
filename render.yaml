@@ -2,7 +2,7 @@ services:
   - type: web
     name: wfg-assignment-backend
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput
     startCommand: python manage.py runserver 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
@@ -17,6 +17,8 @@ services:
         sync: false
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings
+      - key: DEBUG
+        value: "False"
     healthCheckPath: /
 
 workers:
@@ -38,4 +40,6 @@ workers:
         sync: false
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings
+      - key: DEBUG
+        value: "False"
 
