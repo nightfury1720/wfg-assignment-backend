@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: wfg-assignment-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.18
+      - key: DATABASE_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+    healthCheckPath: /
+
+workers:
+  - type: worker
+    name: wfg-assignment-backend-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A config worker --loglevel=info
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.18
+      - key: DATABASE_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+
