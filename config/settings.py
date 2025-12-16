@@ -147,14 +147,29 @@ CORS_ALLOW_CREDENTIALS = True
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv(
     'CELERY_BROKER_URL', 
-    'redis://default:AU2oAAIncDExYjU3ZjQ4NGY3ZGI0MTUzOTBiZGE5N2Q1Y2M3MTYzMHAxMTk4ODA@exotic-shepherd-19880.upstash.io:6379'
+    'rediss://default:AU2oAAIncDExYjU3ZjQ4NGY3ZGI0MTUzOTBiZGE5N2Q1Y2M3MTYzMHAxMTk4ODA@exotic-shepherd-19880.upstash.io:6379?ssl_cert_reqs=none'
 )
 CELERY_RESULT_BACKEND = os.getenv(
     'CELERY_RESULT_BACKEND', 
-    'redis://default:AU2oAAIncDExYjU3ZjQ4NGY3ZGI0MTUzOTBiZGE5N2Q1Y2M3MTYzMHAxMTk4ODA@exotic-shepherd-19880.upstash.io:6379'
+    'rediss://default:AU2oAAIncDExYjU3ZjQ4NGY3ZGI0MTUzOTBiZGE5N2Q1Y2M3MTYzMHAxMTk4ODA@exotic-shepherd-19880.upstash.io:6379?ssl_cert_reqs=none'
 )
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# SSL configuration for Upstash Redis
+if 'upstash.io' in CELERY_BROKER_URL or 'upstash.io' in CELERY_RESULT_BACKEND:
+    import ssl
+    CELERY_BROKER_TRANSPORT_OPTIONS = {
+        'connection_pool_kwargs': {
+            'ssl_cert_reqs': ssl.CERT_NONE,
+        }
+    }
+    CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
+        'connection_pool_kwargs': {
+            'ssl_cert_reqs': ssl.CERT_NONE,
+        }
+    }

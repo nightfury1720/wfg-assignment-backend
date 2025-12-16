@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# Get port from environment variable, default to 8000 if not set
 PORT=${PORT:-10000}
 
 # Start uvicorn with ASGI application

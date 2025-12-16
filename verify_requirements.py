@@ -11,7 +11,7 @@ import time
 import json
 from datetime import datetime
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:10000"
 
 
 def print_section(title):
@@ -290,12 +290,16 @@ def main():
     print("   1. Django server running: python manage.py runserver")
     print("   2. Celery worker running: celery -A config worker --loglevel=info")
     print("   3. Redis/Upstash accessible (configured in .env)")
-    print("\n   Press Enter to continue or Ctrl+C to cancel...")
-    try:
-        input()
-    except KeyboardInterrupt:
-        print("\n❌ Cancelled")
-        return
+    import sys
+    if sys.stdin.isatty():
+        print("\n   Press Enter to continue or Ctrl+C to cancel...")
+        try:
+            input()
+        except KeyboardInterrupt:
+            print("\n❌ Cancelled")
+            return
+    else:
+        print("\n   Non-interactive mode: Starting tests...")
     
     try:
         test_health_check()
@@ -315,7 +319,7 @@ def main():
         
     except requests.exceptions.ConnectionError:
         print("\n❌ Error: Could not connect to server")
-        print("   Make sure Django server is running on http://localhost:8000")
+        print(f"   Make sure Django server is running on {BASE_URL}")
     except AssertionError as e:
         print(f"\n❌ Test Failed: {e}")
         raise

@@ -2,6 +2,48 @@
 
 A Django-based service that receives transaction webhooks from external payment processors and processes them reliably in the background using Celery.
 
+## API Endpoints
+
+### 1. Webhook Transaction
+- **Endpoint**: `POST /v1/webhooks/transactions`
+- **Status Code**: `202 Accepted`
+- **Request Body**:
+```json
+{
+  "transaction_id": "txn_abc123def456",
+  "source_account": "acc_user_789",
+  "destination_account": "acc_merchant_456",
+  "amount": 1500,
+  "currency": "INR"
+}
+```
+
+### 2. Get Transaction
+- **Endpoint**: `GET /v1/transactions/{transaction_id}`
+- **Response**:
+```json
+[{
+  "transaction_id": "txn_abc123def456",
+  "source_account": "acc_user_789",
+  "destination_account": "acc_merchant_456",
+  "amount": "150.50",
+  "currency": "USD",
+  "status": "PROCESSED",
+  "created_at": "2024-01-15T10:30:00Z",
+  "processed_at": "2024-01-15T10:30:30Z"
+}]
+```
+
+### 3. Health Check
+- **Endpoint**: `GET /`
+- **Response**:
+```json
+{
+  "status": "HEALTHY",
+  "current_time": "2024-01-15T10:30:00Z"
+}
+```
+
 ## Features
 
 - ✅ Webhook endpoint that accepts transaction data
@@ -51,22 +93,18 @@ pip install -r requirements.txt
 
 You can either run the setup script or create a `.env` file manually:
 
-**Option 1: Use setup script (recommended)**
-```bash
-./setup_env.sh
-```
 
-**Option 2: Create .env manually**
+**Option 1: Create .env manually**
 
 Create a `.env` file in the `backend` directory:
 
 ```env
 # Supabase Database Connection
-DATABASE_URL=postgresql://postgres:3h9He*qGc9cD5Qu@db.qiudtvmfrdwjnlneawfy.supabase.co:5432/postgres
+DATABASE_URL=postgresql://user:password@host:5432/database
 
 # Celery Configuration (Upstash Redis)
-CELERY_BROKER_URL=redis://default:AU2oAAIncDExYjU3ZjQ4NGY3ZGI0MTUzOTBiZGE5N2Q1Y2M3MTYzMHAxMTk4ODA@exotic-shepherd-19880.upstash.io:6379
-CELERY_RESULT_BACKEND=redis://default:AU2oAAIncDExYjU3ZjQ4NGY3ZGI0MTUzOTBiZGE5N2Q1Y2M3MTYzMHAxMTk4ODA@exotic-shepherd-19880.upstash.io:6379
+CELERY_BROKER_URL=redis://default:password@host:6379
+CELERY_RESULT_BACKEND=redis://default:password@host:6379
 
 # Django Secret Key (change in production)
 SECRET_KEY=your-secret-key-here
@@ -103,48 +141,6 @@ python manage.py runserver
 ```
 
 The API will be available at `http://localhost:8000`
-
-## API Endpoints
-
-### 1. Health Check
-- **Endpoint**: `GET /`
-- **Response**:
-```json
-{
-  "status": "HEALTHY",
-  "current_time": "2024-01-15T10:30:00Z"
-}
-```
-
-### 2. Webhook Transaction
-- **Endpoint**: `POST /v1/webhooks/transactions`
-- **Status Code**: `202 Accepted`
-- **Request Body**:
-```json
-{
-  "transaction_id": "txn_abc123def456",
-  "source_account": "acc_user_789",
-  "destination_account": "acc_merchant_456",
-  "amount": 1500,
-  "currency": "INR"
-}
-```
-
-### 3. Get Transaction
-- **Endpoint**: `GET /v1/transactions/{transaction_id}`
-- **Response**:
-```json
-[{
-  "transaction_id": "txn_abc123def456",
-  "source_account": "acc_user_789",
-  "destination_account": "acc_merchant_456",
-  "amount": "150.50",
-  "currency": "USD",
-  "status": "PROCESSED",
-  "created_at": "2024-01-15T10:30:00Z",
-  "processed_at": "2024-01-15T10:30:30Z"
-}]
-```
 
 ## Testing
 

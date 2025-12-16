@@ -30,13 +30,6 @@ def webhook_transaction(request):
     
     db = SessionLocal()
     try:
-        existing_transaction = db.query(Transaction).filter(
-            Transaction.transaction_id == transaction_id
-        ).first()
-        
-        if existing_transaction:
-            return Response(status=status.HTTP_202_ACCEPTED)
-        
         new_transaction = Transaction(
             transaction_id=transaction_id,
             source_account=data['source_account'],
