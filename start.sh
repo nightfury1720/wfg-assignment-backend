@@ -2,7 +2,7 @@
 set -e
 
 # Get port from environment variable, default to 8000 if not set
-PORT=${PORT:-8000}
+PORT=${PORT:-10000}
 
 # Start uvicorn with ASGI application
 exec uvicorn config.asgi:application \
