@@ -11,7 +11,7 @@ import time
 import json
 from datetime import datetime
 
-BASE_URL = "http://localhost:10000"
+BASE_URL = "https://wfg-assignment-backend.onrender.com"
 
 
 def print_section(title):
@@ -48,9 +48,15 @@ def test_single_transaction_30_second_delay():
     )
     response_time = (time.time() - start_time) * 1000
     
-    print(f"   ✅ Response Status: {response.status_code}")
-    print(f"   ✅ Response Time: {response_time:.2f}ms")
-    assert response.status_code == 202, "Should return 202 Accepted"
+    print(f"   Response Status: {response.status_code}")
+    print(f"   Response Time: {response_time:.2f}ms")
+    if response.status_code != 202:
+        try:
+            error_data = response.json()
+            print(f"   ❌ Error Response: {error_data}")
+        except:
+            print(f"   ❌ Error Response: {response.text}")
+    assert response.status_code == 202, f"Should return 202 Accepted, got {response.status_code}"
     assert response_time < 500, f"Response should be <500ms, got {response_time}ms"
     print(f"   ✅ Webhook responded immediately (task queued in Redis, not server memory)")
     
@@ -286,10 +292,9 @@ def main():
     print("  Testing 4 Success Criteria")
     print("="*70)
     
-    print("\n⚠️  Prerequisites:")
-    print("   1. Django server running: python manage.py runserver")
-    print("   2. Celery worker running: celery -A config worker --loglevel=info")
-    print("   3. Redis/Upstash accessible (configured in .env)")
+    print("\n⚠️  Testing against hosted server:")
+    print(f"   {BASE_URL}")
+    print("   (Server should be running with Celery worker and Redis configured)")
     import sys
     if sys.stdin.isatty():
         print("\n   Press Enter to continue or Ctrl+C to cancel...")
@@ -319,7 +324,7 @@ def main():
         
     except requests.exceptions.ConnectionError:
         print("\n❌ Error: Could not connect to server")
-        print(f"   Make sure Django server is running on {BASE_URL}")
+        print(f"   Make sure the hosted server is accessible at {BASE_URL}")
     except AssertionError as e:
         print(f"\n❌ Test Failed: {e}")
         raise

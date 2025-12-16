@@ -3,11 +3,15 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from datetime import datetime
 from django.http import JsonResponse
+import traceback
+import logging
 from .serializers import TransactionWebhookSerializer
 from .tasks import process_transaction
 from .database import SessionLocal
 from .sqlalchemy_models import Transaction, TransactionStatus
 from sqlalchemy.exc import IntegrityError
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -50,8 +54,14 @@ def webhook_transaction(request):
         return Response(status=status.HTTP_202_ACCEPTED)
     except Exception as e:
         db.rollback()
+        error_details = {
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }
+        logger.error(f"Webhook transaction error: {error_details}")
         return Response(
-            {'error': str(e)},
+            error_details,
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     finally:
@@ -84,5 +94,16 @@ def get_transaction(request, transaction_id):
         }]
         
         return Response(result)
+    except Exception as e:
+        error_details = {
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }
+        logger.error(f"Get transaction error: {error_details}")
+        return Response(
+            error_details,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     finally:
         db.close()
