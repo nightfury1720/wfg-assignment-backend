@@ -5,8 +5,8 @@ from .sqlalchemy_models import Transaction, TransactionStatus
 import time
 
 
-@shared_task
-def process_transaction(transaction_id):
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def process_transaction(self, transaction_id):
     db = SessionLocal()
     try:
         transaction = db.query(Transaction).filter(
@@ -28,7 +28,9 @@ def process_transaction(transaction_id):
         return f"Transaction {transaction_id} processed successfully"
     except Exception as e:
         db.rollback()
-        return f"Error processing transaction {transaction_id}: {str(e)}"
+        if self.request.retries >= self.max_retries:
+            return f"Error processing transaction {transaction_id}: Max retries exceeded. Last error: {str(e)}"
+        raise self.retry(exc=e, countdown=60)
     finally:
         db.close()
 
