@@ -3,7 +3,7 @@ services:
     name: wfg-assignment-backend
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: chmod +x start.sh && ./start.sh
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.18
